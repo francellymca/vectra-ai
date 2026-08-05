@@ -28,6 +28,7 @@ services:
       - TZ=${GENERIC_TIMEZONE}
     volumes:
       - n8n_data:/home/node/.n8n
+      - ./docs/pdf:/files:ro
     depends_on:
       - qdrant
     networks:
