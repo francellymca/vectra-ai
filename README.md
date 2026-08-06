@@ -23,24 +23,21 @@ The project combines workflow automation, vector databases and modern LLMs to si
 
 ---
 
-# Current Status
+## Current Status
 
-Current Version
-
-**v0.3.0**
-
-Development Progress
+**Current Version:** v0.4.0
 
 | Component | Status |
-|-----------|---------|
+|---|---|
 | Docker Environment | ✅ Completed |
-| Knowledge Base | ✅ Completed |
-| Automatic PDF Generator | ✅ Completed |
+| Corporate Knowledge Base | ✅ Completed |
+| Automated PDF Generator | ✅ Completed |
 | Qdrant Vector Database | ✅ Completed |
-| Knowledge Ingestion Workflow | ✅ Completed |
-| Vector Embeddings | ✅ Completed |
-| Retrieval Workflow | 🚧 In Progress |
-| AI Agent | 🚧 In Progress |
+| Knowledge Base Ingestion Workflow | ✅ Completed |
+| Gemini Embeddings | ✅ Completed |
+| RAG Query Workflow | ✅ Completed |
+| Vectra AI Assistant | ✅ Completed |
+| Response Validation and Refinement | 🚧 In Progress |
 | Telegram Integration | ⏳ Planned |
 | Oracle Cloud Deployment | ⏳ Planned |
 
@@ -72,6 +69,19 @@ The complete solution is composed of four major layers:
 - Response Generation
 
 The assistant retrieves relevant document chunks from Qdrant before sending contextual information to the LLM, ensuring grounded responses.
+
+## RAG Query Workflow
+
+![RAG Query Flow](diagrams/exports/png/02-rag-query-flow.png)
+
+The query workflow follows this sequence:
+
+1. The user sends a question through the n8n chat interface.
+2. The AI Agent determines whether the corporate knowledge base must be queried.
+3. Google Gemini generates the semantic embedding for the question.
+4. Qdrant retrieves the most relevant document chunks.
+5. Groq generates the final answer using the retrieved context.
+6. The assistant returns a grounded response and identifies the source document when available.
 
 ---
 
@@ -147,12 +157,12 @@ This guarantees reproducibility across different machines and simplifies deploym
 
 ---
 
-# Implemented Workflows
+## Implemented Workflows
 
 | Workflow | Status | Description |
-|-----------|---------|-------------|
-| 01 - Knowledge Base Ingestion | ✅ | Reads PDF documents, generates embeddings and stores vectors in Qdrant |
-| 02 - RAG Query Engine | 🚧 | Semantic retrieval and answer generation |
+|---|---|---|
+| 01 - Knowledge Base Ingestion | ✅ Completed | Reads corporate PDF documents, splits the content into chunks, generates embeddings with Google Gemini and stores the vectors in Qdrant. |
+| 02 - RAG Query Engine | ✅ Completed | Receives user questions, retrieves relevant corporate information from Qdrant and generates grounded responses using Groq. |
 | 03 - Telegram Assistant | ⏳ | Conversational interface |
 | 04 - OCI Deployment | ⏳ | Cloud deployment |
 
@@ -170,6 +180,25 @@ The ingestion workflow currently performs:
 4. Generates vector embeddings
 5. Associates metadata
 6. Stores vectors inside Qdrant
+
+---
+
+## Vectra AI Assistant
+
+The **Vectra AI Assistant** is the conversational layer of the project.
+
+It receives questions in Brazilian Portuguese, searches the corporate knowledge base and generates answers based exclusively on the retrieved documentation.
+
+The assistant currently supports:
+
+- shipping policies;
+- order tracking;
+- refunds and claims;
+- customer service and complaints;
+- frequently asked questions;
+- operational procedures.
+
+When no relevant information is found, the assistant does not use external knowledge and informs the user that the requested topic is not available in the documentation.
 
 ---
 
@@ -201,26 +230,26 @@ Execute the Knowledge Base Ingestion workflow.
 
 The assistant is expected to answer questions such as:
 
-- What is the company's refund policy?
-- How can I track my shipment?
-- Who is responsible for packaging?
-- Can I cancel a delivery?
-- Which products are restricted for transportation?
+- Como funciona a política de reembolsos?
 
 ---
 
 # Example Response
 
-Question
+The assistant retrieves the corporate refund and claims documentation and returns information about:
 
-> How can I request a refund?
+- the purpose and scope of the policy;
+- the estimated analysis period;
+- possible outcomes of the request;
+- the corresponding source document.
 
-Answer
+### Out-of-Scope Question
 
-```
-Refund requests must be submitted within 30 days after delivery.
+> Me fale sobre a Copa do Mundo.
 
-Required documentation includes the purchase invoice and proof of shipment.
+### Expected Behavior
+
+The assistant informs the user that no corresponding information was found in the corporate knowledge base and does not generate an answer using external knowledge.
 
 Source:
 refund-policy.pdf
@@ -249,27 +278,21 @@ The repository includes complete architectural documentation.
 
 ---
 
-# Roadmap
+## Roadmap
 
-- [x] Docker Environment
-
-- [x] Knowledge Base
-
-- [x] PDF Generator
-
-- [x] Qdrant Integration
-
-- [x] Embedding Generation
-
-- [x] Knowledge Ingestion
-
-- [ ] Semantic Retrieval
-
-- [ ] AI Agent
-
-- [ ] Telegram Bot
-
-- [ ] OCI Deployment
+- [x] Project structure
+- [x] Docker environment
+- [x] Corporate knowledge base
+- [x] Automated PDF generation
+- [x] Qdrant integration
+- [x] Knowledge ingestion workflow
+- [x] Gemini embedding generation
+- [x] RAG query workflow
+- [x] Vectra AI Assistant
+- [ ] Prompt and response refinement
+- [ ] Telegram integration
+- [ ] OCI deployment
+- [ ] Final documentation and evidence
 
 ---
 
