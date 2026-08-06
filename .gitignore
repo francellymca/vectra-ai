@@ -1,13 +1,22 @@
 # ==========================
 # Environment Variables
 # ==========================
+
+# Local development
 .env
-.env.*
+
+# Production environment
+deployment/docker/.env.production
+
+# Keep example files
 !.env.example
+!deployment/docker/.env.production.example
+
 
 # ==========================
 # Python
 # ==========================
+
 __pycache__/
 *.py[cod]
 *.pyo
@@ -17,36 +26,52 @@ __pycache__/
 venv/
 env/
 
+.pytest_cache/
+.coverage
+htmlcov/
+
+
 # ==========================
 # n8n
 # ==========================
+
 .n8n/
 backups/
+
 
 # ==========================
 # Docker
 # ==========================
+
 docker-data/
+
 
 # ==========================
 # Logs
 # ==========================
+
 *.log
 logs/
+
 
 # ==========================
 # VS Code
 # ==========================
+
 .vscode/
+
 
 # ==========================
 # Operating System
 # ==========================
+
 .DS_Store
 Thumbs.db
+
 
 # ==========================
 # Temporary Files
 # ==========================
+
 tmp/
 temp/
