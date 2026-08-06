@@ -30,7 +30,7 @@ services:
       - N8N_RESTRICT_FILE_ACCESS_TO=/files
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./docs/pdf:/files:ro
+      - ./docs/pdf/knowledge:/files:ro
     depends_on:
       - qdrant
     networks:

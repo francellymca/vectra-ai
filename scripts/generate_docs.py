@@ -1,8 +1,11 @@
 """
-Vectra AI - Corporate PDF Generator
+Vectra AI - Documentation PDF Generator
 
-Converts every Markdown file in docs/source into a standardized
-corporate PDF stored in docs/pdf.
+Converts Markdown documentation into standardized PDF files.
+
+Pipelines:
+    docs/source/*.md -> docs/pdf/knowledge/*.pdf
+    docs/ai/*.md     -> docs/pdf/ai/*.pdf
 
 Usage:
     python scripts/generate_docs.py
@@ -13,6 +16,7 @@ from __future__ import annotations
 import html
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
@@ -35,9 +39,8 @@ from reportlab.platypus import (
     TableStyle,
 )
 
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SOURCE_DIR = PROJECT_ROOT / "docs" / "source"
-OUTPUT_DIR = PROJECT_ROOT / "docs" / "pdf"
 
 NAVY = colors.HexColor("#0B1F3A")
 OCEAN = colors.HexColor("#0077B6")
@@ -49,6 +52,62 @@ BORDER = colors.HexColor("#B8D8F0")
 WHITE = colors.white
 
 PAGE_WIDTH, PAGE_HEIGHT = A4
+
+
+@dataclass(frozen=True)
+class DocumentProfile:
+    """Defines source, destination and visual identity for a document group."""
+
+    key: str
+    source_dir: Path
+    output_dir: Path
+    header_title: str
+    header_subtitle: str
+    footer_text: str
+    pdf_subject: str
+    cover_message: str
+    default_code: str
+    metadata_keys: tuple[str, ...]
+
+
+DOCUMENT_PROFILES = (
+    DocumentProfile(
+        key="knowledge",
+        source_dir=PROJECT_ROOT / "docs" / "source",
+        output_dir=PROJECT_ROOT / "docs" / "pdf" / "knowledge",
+        header_title="VECTRA LOGISTICS",
+        header_subtitle="Corporate Knowledge Base",
+        footer_text="Vectra AI - Logistics Knowledge Management",
+        pdf_subject="Vectra Logistics Corporate Knowledge Base",
+        cover_message="Corporate document prepared for the Vectra AI knowledge base.",
+        default_code="VECTRA LOGISTICS",
+        metadata_keys=(
+            "Empresa",
+            "Documento",
+            "Versão",
+            "Última atualização",
+            "Departamento responsável",
+        ),
+    ),
+    DocumentProfile(
+        key="ai",
+        source_dir=PROJECT_ROOT / "docs" / "ai",
+        output_dir=PROJECT_ROOT / "docs" / "pdf" / "ai",
+        header_title="VECTRA AI",
+        header_subtitle="AI Engineering Documentation",
+        footer_text="Vectra AI - Assistant Behavioral Documentation",
+        pdf_subject="Vectra AI Engineering Documentation",
+        cover_message="Technical document describing the Vectra AI Assistant.",
+        default_code="VECTRA AI",
+        metadata_keys=(
+            "Documento",
+            "Versão",
+            "Status",
+            "Última atualização",
+            "Responsável",
+        ),
+    ),
+)
 
 
 def inline_markup(text: str) -> str:
@@ -145,6 +204,22 @@ def build_styles() -> dict[str, ParagraphStyle]:
             textColor=TEXT,
             leftIndent=4,
         ),
+        "quote": ParagraphStyle(
+            "Quote",
+            parent=base["BodyText"],
+            fontName="Helvetica-Oblique",
+            fontSize=9.2,
+            leading=13.8,
+            textColor=TEXT,
+            leftIndent=12,
+            rightIndent=8,
+            borderColor=BORDER,
+            borderWidth=1,
+            borderPadding=7,
+            backColor=LIGHT_BLUE,
+            spaceBefore=5,
+            spaceAfter=8,
+        ),
         "table_header": ParagraphStyle(
             "TableHeader",
             parent=base["Normal"],
@@ -169,42 +244,47 @@ def build_styles() -> dict[str, ParagraphStyle]:
 STYLES = build_styles()
 
 
-def header_footer(canvas, doc) -> None:
-    canvas.saveState()
+def make_header_footer(profile: DocumentProfile):
+    """Create a page callback using the selected document profile."""
 
-    # Header
-    canvas.setFillColor(NAVY)
-    canvas.rect(0, PAGE_HEIGHT - 18 * mm, PAGE_WIDTH, 18 * mm, fill=1, stroke=0)
+    def header_footer(canvas, doc) -> None:
+        canvas.saveState()
 
-    canvas.setFillColor(WHITE)
-    canvas.setFont("Helvetica-Bold", 10)
-    canvas.drawString(18 * mm, PAGE_HEIGHT - 11.5 * mm, "VECTRA LOGISTICS")
+        # Header
+        canvas.setFillColor(NAVY)
+        canvas.rect(0, PAGE_HEIGHT - 18 * mm, PAGE_WIDTH, 18 * mm, fill=1, stroke=0)
 
-    canvas.setFont("Helvetica", 8)
-    canvas.drawRightString(
-        PAGE_WIDTH - 18 * mm,
-        PAGE_HEIGHT - 11.5 * mm,
-        "Corporate Knowledge Base",
-    )
+        canvas.setFillColor(WHITE)
+        canvas.setFont("Helvetica-Bold", 10)
+        canvas.drawString(18 * mm, PAGE_HEIGHT - 11.5 * mm, profile.header_title)
 
-    # Footer
-    canvas.setStrokeColor(BORDER)
-    canvas.setLineWidth(0.6)
-    canvas.line(18 * mm, 15 * mm, PAGE_WIDTH - 18 * mm, 15 * mm)
+        canvas.setFont("Helvetica", 8)
+        canvas.drawRightString(
+            PAGE_WIDTH - 18 * mm,
+            PAGE_HEIGHT - 11.5 * mm,
+            profile.header_subtitle,
+        )
 
-    canvas.setFillColor(MUTED)
-    canvas.setFont("Helvetica", 7.5)
-    canvas.drawString(18 * mm, 9.5 * mm, "Vectra AI - Logistics Knowledge Management")
-    canvas.drawRightString(
-        PAGE_WIDTH - 18 * mm,
-        9.5 * mm,
-        f"Page {doc.page}",
-    )
+        # Footer
+        canvas.setStrokeColor(BORDER)
+        canvas.setLineWidth(0.6)
+        canvas.line(18 * mm, 15 * mm, PAGE_WIDTH - 18 * mm, 15 * mm)
 
-    canvas.restoreState()
+        canvas.setFillColor(MUTED)
+        canvas.setFont("Helvetica", 7.5)
+        canvas.drawString(18 * mm, 9.5 * mm, profile.footer_text)
+        canvas.drawRightString(
+            PAGE_WIDTH - 18 * mm,
+            9.5 * mm,
+            f"Page {doc.page}",
+        )
+
+        canvas.restoreState()
+
+    return header_footer
 
 
-def create_document(output_path: Path) -> BaseDocTemplate:
+def create_document(output_path: Path, profile: DocumentProfile) -> BaseDocTemplate:
     doc = BaseDocTemplate(
         str(output_path),
         pagesize=A4,
@@ -214,7 +294,7 @@ def create_document(output_path: Path) -> BaseDocTemplate:
         bottomMargin=22 * mm,
         title=output_path.stem.replace("-", " ").title(),
         author="Vectra AI",
-        subject="Vectra Logistics Corporate Knowledge Base",
+        subject=profile.pdf_subject,
     )
 
     frame = Frame(
@@ -230,28 +310,39 @@ def create_document(output_path: Path) -> BaseDocTemplate:
     )
 
     doc.addPageTemplates(
-        [PageTemplate(id="corporate", frames=[frame], onPage=header_footer)]
+        [
+            PageTemplate(
+                id=f"{profile.key}-document",
+                frames=[frame],
+                onPage=make_header_footer(profile),
+            )
+        ]
     )
     return doc
 
 
 def find_metadata(lines: list[str], key: str) -> str | None:
     prefix = f"**{key}:**"
-    for line in lines[:20]:
+    for line in lines[:30]:
         stripped = line.strip()
         if stripped.startswith(prefix):
             return stripped[len(prefix):].strip()
     return None
 
 
-def add_cover(story: list, lines: list[str], title_line: str) -> None:
+def add_cover(
+    story: list,
+    lines: list[str],
+    title_line: str,
+    profile: DocumentProfile,
+) -> None:
     raw_title = title_line.lstrip("#").strip()
-    match = re.match(r"([A-Z]{3}-\d{3})\s+[—-]\s+(.+)", raw_title)
+    match = re.match(r"([A-Z]{2,10}-\d{3})\s+[—-]\s+(.+)", raw_title)
 
     if match:
         code, title = match.groups()
     else:
-        code, title = "VECTRA AI", raw_title
+        code, title = profile.default_code, raw_title
 
     story.extend(
         [
@@ -269,30 +360,18 @@ def add_cover(story: list, lines: list[str], title_line: str) -> None:
         ]
     )
 
-    metadata = [
-        ("Empresa", find_metadata(lines, "Empresa")),
-        ("Documento", find_metadata(lines, "Documento")),
-        ("Versão", find_metadata(lines, "Versão")),
-        ("Última atualização", find_metadata(lines, "Última atualização")),
-        ("Departamento responsável", find_metadata(lines, "Departamento responsável")),
-    ]
-
-    for label, value in metadata:
+    for key in profile.metadata_keys:
+        value = find_metadata(lines, key)
         if value:
             story.append(
                 Paragraph(
-                    f"<b>{html.escape(label)}:</b> {inline_markup(value)}",
+                    f"<b>{html.escape(key)}:</b> {inline_markup(value)}",
                     STYLES["cover_meta"],
                 )
             )
 
     story.extend([Spacer(1, 30 * mm), HRFlowable(color=BORDER, thickness=0.8)])
-    story.append(
-        Paragraph(
-            "Corporate document prepared for the Vectra AI knowledge base.",
-            STYLES["cover_meta"],
-        )
-    )
+    story.append(Paragraph(profile.cover_message, STYLES["cover_meta"]))
 
 
 def parse_table(lines: list[str]) -> Table:
@@ -370,7 +449,20 @@ def flush_list(items: list[str], ordered: bool, story: list) -> None:
     items.clear()
 
 
-def markdown_to_story(markdown_text: str) -> list:
+def flush_quote(buffer: list[str], story: list) -> None:
+    if not buffer:
+        return
+
+    text = " ".join(part.strip() for part in buffer if part.strip())
+    if text:
+        story.append(Paragraph(inline_markup(text), STYLES["quote"]))
+    buffer.clear()
+
+
+def markdown_to_story(
+    markdown_text: str,
+    profile: DocumentProfile,
+) -> list:
     lines = markdown_text.splitlines()
     story: list = []
 
@@ -380,22 +472,41 @@ def markdown_to_story(markdown_text: str) -> list:
     )
 
     if first_heading_index is not None:
-        add_cover(story, lines, lines[first_heading_index])
-        lines = lines[first_heading_index + 1:]
+        add_cover(story, lines, lines[first_heading_index], profile)
+        lines = lines[first_heading_index + 1 :]
 
     paragraph_buffer: list[str] = []
+    quote_buffer: list[str] = []
     list_items: list[str] = []
     list_is_ordered = False
     i = 0
+
+    metadata_pattern = "|".join(re.escape(key) for key in profile.metadata_keys)
 
     while i < len(lines):
         raw = lines[i]
         stripped = raw.strip()
 
+        # Blockquote detection
+        if stripped.startswith(">"):
+            flush_paragraph(paragraph_buffer, story)
+            flush_list(list_items, list_is_ordered, story)
+
+            while i < len(lines):
+                candidate = lines[i].strip()
+                if not candidate.startswith(">"):
+                    break
+                quote_buffer.append(candidate.lstrip(">").strip())
+                i += 1
+
+            flush_quote(quote_buffer, story)
+            continue
+
         # Table detection
         if stripped.startswith("|") and stripped.endswith("|"):
             flush_paragraph(paragraph_buffer, story)
             flush_list(list_items, list_is_ordered, story)
+
             table_lines = []
             while i < len(lines):
                 candidate = lines[i].strip()
@@ -403,6 +514,7 @@ def markdown_to_story(markdown_text: str) -> list:
                     break
                 table_lines.append(candidate)
                 i += 1
+
             story.extend([parse_table(table_lines), Spacer(1, 8)])
             continue
 
@@ -412,12 +524,12 @@ def markdown_to_story(markdown_text: str) -> list:
         if bullet_match or ordered_match:
             flush_paragraph(paragraph_buffer, story)
             current_ordered = bool(ordered_match)
+
             if list_items and current_ordered != list_is_ordered:
                 flush_list(list_items, list_is_ordered, story)
+
             list_is_ordered = current_ordered
-            list_items.append(
-                (ordered_match or bullet_match).group(1)
-            )
+            list_items.append((ordered_match or bullet_match).group(1))
             i += 1
             continue
         else:
@@ -453,10 +565,7 @@ def markdown_to_story(markdown_text: str) -> list:
             continue
 
         # Skip metadata block because it is displayed on the cover.
-        if re.match(
-            r"^\*\*(Empresa|Documento|Versão|Última atualização|Departamento responsável):\*\*",
-            stripped,
-        ):
+        if re.match(rf"^\*\*({metadata_pattern}):\*\*", stripped):
             i += 1
             continue
 
@@ -465,46 +574,80 @@ def markdown_to_story(markdown_text: str) -> list:
 
     flush_paragraph(paragraph_buffer, story)
     flush_list(list_items, list_is_ordered, story)
+    flush_quote(quote_buffer, story)
     return story
 
 
-def markdown_files() -> Iterable[Path]:
-    return sorted(SOURCE_DIR.glob("*.md"))
+def markdown_files(profile: DocumentProfile) -> Iterable[Path]:
+    return sorted(profile.source_dir.glob("*.md"))
 
 
-def generate_pdf(source_path: Path, output_path: Path) -> None:
+def generate_pdf(
+    source_path: Path,
+    output_path: Path,
+    profile: DocumentProfile,
+) -> None:
     markdown_text = source_path.read_text(encoding="utf-8")
-    story = markdown_to_story(markdown_text)
-    doc = create_document(output_path)
+    story = markdown_to_story(markdown_text, profile)
+    doc = create_document(output_path, profile)
     doc.build(story)
 
 
+def validate_source_directories() -> list[str]:
+    errors: list[str] = []
+
+    for profile in DOCUMENT_PROFILES:
+        if not profile.source_dir.exists():
+            errors.append(
+                f"source directory not found for '{profile.key}': "
+                f"{profile.source_dir}"
+            )
+
+    return errors
+
+
 def main() -> int:
-    if not SOURCE_DIR.exists():
-        print(f"ERROR: source directory not found: {SOURCE_DIR}", file=sys.stderr)
+    errors = validate_source_directories()
+    if errors:
+        for error in errors:
+            print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
-    files = list(markdown_files())
-    if not files:
-        print(f"ERROR: no Markdown files found in {SOURCE_DIR}", file=sys.stderr)
+    print("Generating Vectra AI documentation PDFs...\n")
+    total_generated = 0
+
+    for profile in DOCUMENT_PROFILES:
+        files = list(markdown_files(profile))
+
+        if not files:
+            print(
+                f"[SKIP] No Markdown files found in "
+                f"{profile.source_dir.relative_to(PROJECT_ROOT)}"
+            )
+            continue
+
+        profile.output_dir.mkdir(parents=True, exist_ok=True)
+
+        print(f"[{profile.key.upper()}]")
+
+        for source_path in files:
+            output_path = profile.output_dir / f"{source_path.stem}.pdf"
+
+            try:
+                generate_pdf(source_path, output_path, profile)
+                print(f"[OK] {output_path.relative_to(PROJECT_ROOT)}")
+                total_generated += 1
+            except Exception as exc:
+                print(f"[ERROR] {source_path.name}: {exc}", file=sys.stderr)
+                return 1
+
+        print()
+
+    if total_generated == 0:
+        print("ERROR: no PDF files were generated.", file=sys.stderr)
         return 1
 
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    print("Generating Vectra Logistics PDFs...\n")
-    generated = 0
-
-    for source_path in files:
-        output_path = OUTPUT_DIR / f"{source_path.stem}.pdf"
-        try:
-            generate_pdf(source_path, output_path)
-            print(f"[OK] {output_path.relative_to(PROJECT_ROOT)}")
-            generated += 1
-        except Exception as exc:
-            print(f"[ERROR] {source_path.name}: {exc}", file=sys.stderr)
-            return 1
-
-    print(f"\nCompleted: {generated} PDF file(s) generated.")
+    print(f"Completed: {total_generated} PDF file(s) generated.")
     return 0
 
 
