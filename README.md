@@ -28,7 +28,7 @@ The project combines workflow automation, vector search and modern LLMs to simul
 | Property | Value |
 |-----------|-------|
 | Status | 🟢 In Development |
-| Current Version | **v0.5.0** |
+| Current Version | **v0.6.0** |
 | Architecture | Enterprise Retrieval-Augmented Generation |
 | Development Stage | Functional RAG Prototype |
 | Cloud Deployment | Planned (Oracle Cloud Infrastructure) |
