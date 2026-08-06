@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+
+# Local environment files
+.env
+.env.*
+!.env.example
+!deployment/docker/.env.production.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local Docker and runtime data
+docker-data/
+.n8n/
+backups/
+logs/
+*.log
+
+# Development and editor files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Files not required by the Railway n8n image
+assets/
+diagrams/
+screenshots/
+scripts/
+tests/
+workflows/
+deployment/
+docs/source/
+docs/ai/
+docs/pdf/ai/
+
+# Local Compose configuration
+docker-compose.yml
+requirements.txt
+README.md
