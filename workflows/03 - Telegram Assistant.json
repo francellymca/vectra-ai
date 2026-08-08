@@ -1,0 +1,203 @@
+{
+  "name": "03 - Telegram Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -480,
+        -160
+      ],
+      "id": "bffe8010-f10c-4511-8757-f5676badbec5",
+      "name": "Telegram Trigger",
+      "webhookId": "12da598d-ebf4-4ba1-8a51-9c9d6b32fe1c",
+      "credentials": {
+        "telegramApi": {
+          "id": "5a9HV7hrFc716ihZ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "Você é o Vectra AI Assistant, o assistente corporativo oficial da Vectra AI.\n\nSua função é responder exclusivamente utilizando as informações recuperadas da base de conhecimento corporativa.\n\nVocê nunca deve utilizar conhecimento próprio, informações externas ou fazer suposições.\n\n──────────────────────────────────────\nIDENTIDADE\n──────────────────────────────────────\n\nNa primeira mensagem de uma nova conversa, apresente-se exatamente da seguinte forma:\n\n\"Olá! Sou o Vectra AI Assistant. Posso ajudar você com informações sobre políticas, procedimentos e processos da Vectra AI. Como posso ajudar?\"\n\nApós essa primeira saudação, nunca mais repita sua apresentação durante a mesma conversa.\n\n──────────────────────────────────────\nESCOPO DA BASE DE CONHECIMENTO\n──────────────────────────────────────\n\nA base de conhecimento contém documentação corporativa relacionada a:\n\n• políticas de envio;\n• rastreamento de pedidos;\n• reembolsos;\n• sinistros;\n• atendimento ao cliente;\n• reclamações;\n• perguntas frequentes;\n• procedimentos internos;\n• regras operacionais;\n• documentos institucionais.\n\nSempre consulte a base de conhecimento antes de responder qualquer pergunta relacionada ao negócio da empresa.\n\nUtilize exclusivamente as informações recuperadas pela busca vetorial.\n\n──────────────────────────────────────\nREGRAS DE RESPOSTA\n──────────────────────────────────────\n\nSempre:\n\n• responda apenas utilizando o conteúdo recuperado da base;\n• organize respostas longas em tópicos;\n• mantenha linguagem profissional e objetiva;\n• preserve o significado da documentação recuperada;\n• informe a fonte utilizada ao final da resposta.\n\nFormato obrigatório da fonte:\n\nFonte:\n[nome do documento]\n\n──────────────────────────────────────\nPERGUNTAS AMBÍGUAS\n──────────────────────────────────────\n\nAntes de responder, avalie se a pergunta possui contexto suficiente.\n\nConsidere uma pergunta ambígua apenas quando ela depender de contexto anterior ou não indicar claramente o assunto.\n\nExemplos:\n\n• Como funciona isso?\n• Pode explicar melhor?\n• E depois?\n• Quanto tempo demora?\n• Isso é permitido?\n\nNesses casos responda exatamente:\n\n\"Você pode fornecer mais detalhes sobre sua dúvida? Por exemplo: política de envios, rastreamento de pedidos, reembolsos, reclamações ou outro procedimento.\"\n\nNão consulte a base antes de solicitar esclarecimentos para perguntas ambíguas.\n\n──────────────────────────────────────\nINFORMAÇÕES NÃO ENCONTRADAS\n──────────────────────────────────────\n\nCaso a busca não recupere informações suficientes para responder, utilize exatamente o seguinte formato:\n\nResultado da consulta\n\nNão encontrei informações sobre esse assunto na base de conhecimento disponível.\n\nO Vectra AI Assistant responde exclusivamente com base na documentação corporativa da empresa.\n\nCaso sua dúvida esteja relacionada às políticas, procedimentos ou processos da empresa, ficarei feliz em ajudar.\n\nFonte:\nNenhum documento correspondente foi localizado.\n\n──────────────────────────────────────\nPERGUNTAS FORA DO ESCOPO\n──────────────────────────────────────\n\nPerguntas claras sobre assuntos que não pertencem à documentação corporativa da empresa NÃO devem ser tratadas como perguntas ambíguas.\n\nExemplos:\n\n• Quem ganhou a Copa do Mundo?\n• Faça uma receita de bolo.\n• Quem descobriu o Brasil?\n• Como programar em Python?\n• Qual é a capital da França?\n\nEssas perguntas devem utilizar exatamente o formato definido na seção \"Informações Não Encontradas\".\n\n──────────────────────────────────────\nREGRAS OBRIGATÓRIAS\n──────────────────────────────────────\n\nNunca:\n\n• utilize conhecimento próprio;\n• invente informações;\n• faça suposições;\n• crie procedimentos inexistentes;\n• responda utilizando informações externas;\n• peça desculpas;\n• utilize expressões como \"Desculpe\", \"Lamento\" ou \"Infelizmente\";\n• mencione Qdrant, embeddings, vetores, RAG, workflows, modelos de IA ou qualquer detalhe técnico interno.\n\nSempre mantenha suas respostas limitadas ao conteúdo disponível na documentação corporativa da Vectra AI."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -256,
+        -160
+      ],
+      "id": "60043eb0-4328-40ad-945d-0e99cafa2301",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        48
+      ],
+      "id": "cacca598-c621-444c-a2fb-d75491dc9983",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "Um4zyzdsYR8fD2vJ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Consulte a base de conhecimento da Vectra AI para recuperar informações dos documentos corporativos.\n\nUtilize esta ferramenta para responder perguntas relacionadas a:\n\n• políticas de envio;\n• rastreamento de pedidos;\n• reembolsos;\n• sinistros;\n• atendimento ao cliente;\n• reclamações;\n• perguntas frequentes;\n• procedimentos internos;\n• regras operacionais;\n• documentos institucionais.\n\nSempre consulte esta ferramenta antes de responder perguntas sobre o negócio da empresa.\n\nUtilize apenas as informações recuperadas pela busca vetorial e aproveite os metadados retornados para identificar a origem da resposta.\n\nCaso a informação não seja encontrada na base de conhecimento, informe que ela não está disponível na documentação e não gere respostas especulativas.\n\nQuando disponível, utilize os metadados recuperados para indicar o documento utilizado como fonte da resposta.",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "vectra-kb",
+          "mode": "list",
+          "cachedResultName": "vectra-kb"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        -16
+      ],
+      "id": "3fc483fd-fadd-4bf8-8982-6bbab3ddec95",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "S5nqOTs07RhvSR1Z",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        128
+      ],
+      "id": "6cc3178e-6009-43a3-924d-fd0ad8c3124c",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cykmrSQI1e19bWPJ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        -176
+      ],
+      "id": "cb75e212-68e8-4e94-90aa-cb3aabafbb50",
+      "name": "Send a text message",
+      "webhookId": "c7b83504-68f1-49ad-9dd7-cc3039e28173",
+      "credentials": {
+        "telegramApi": {
+          "id": "5a9HV7hrFc716ihZ",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ba3d741d-da78-4857-ad3d-951bbbfb4e23",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "24b858763067b1dd73b2c28df9b0bd29ca1753cb9a986530e6a758deefe68c34"
+  },
+  "nodeGroups": [],
+  "id": "IVjvJ03hqOEeTeNR",
+  "tags": []
+}

@@ -1,5 +1,6 @@
-# Vectra AI Deployment
+# Deployment
 
+<<<<<<< HEAD
 This directory contains the infrastructure and deployment resources required to run Vectra AI outside the local development environment.
 
 The current validated production target is **Oracle Cloud Infrastructure (OCI)** using Docker Compose.
@@ -22,28 +23,33 @@ Secure external access to the n8n instance is provided through **Cloudflare Tunn
 | RAG Query Engine | ✅ Validated |
 | Telegram Integration | 🚧 In Progress |
 | Final Deployment Evidence | 🚧 In Progress |
+=======
 
----
 
-# Directory Structure
+## Directory Structure
 
 ```text
 deployment/
 ├── docker/
 │   ├── docker-compose.production.yml
 │   ├── .env.production.example
+<<<<<<< HEAD
 │   └── .env.production
 │
 ├── oci/
 │   └── README.md
 │
 └── README.md
-```
+=======
+│   └── README.md
+
+
 
 > `.env.production` contains environment-specific and sensitive configuration and must not be committed to source control.
 
 ---
 
+<<<<<<< HEAD
 # Deployment Architecture
 
 ```text
@@ -69,13 +75,12 @@ deployment/
 The production environment separates public access from internal service communication.
 
 n8n is exposed through Cloudflare Tunnel, while Qdrant remains isolated inside the Docker network.
+=======
+### Cloudflared
 
----
+Contains the Cloudflare Tunnel configuration used to securely expose the n8n instance without opening inbound ports.
 
-# Deployment Components
-
-The production environment includes:
-
+<<<<<<< HEAD
 - Oracle Cloud Compute Instance
 - Ubuntu Server
 - Docker Engine

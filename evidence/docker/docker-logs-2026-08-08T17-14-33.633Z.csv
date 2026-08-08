@@ -1,0 +1,99 @@
+﻿timestamp,object,message
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant,           _                 _    
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant,  __ _  __| |_ __ __ _ _ __ | |_  
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant, / _` |/ _` | '__/ _` | '_ \| __| 
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant,| (_| | (_| | | | (_| | | | | |_  
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant," \__, |\__,_|_|  \__,_|_| |_|\__| "
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant,    |_|                           
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant,
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant,"Version: 1.18.3, build: db8fa43f"
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant,Access web UI at http://localhost:6333/dashboard
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant,Agentic Skills: https://skills.qdrant.tech/
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant,
+2026-08-07T04:14:43.746Z,vectra-ai/qdrant,2026-08-07T04:14:43.746546Z  INFO storage::content_manager::consensus::persistent: Loading raft state from ./storage/raft_state.json
+2026-08-07T04:14:43.754Z,vectra-ai/qdrant,2026-08-07T04:14:43.754187Z  INFO storage::content_manager::toc: Loading collection: vectra-kb
+2026-08-07T04:14:43.771Z,vectra-ai/qdrant,2026-08-07T04:14:43.771097Z  INFO collection::shards::local_shard: Recovering shard ./storage/collections/vectra-kb/0: 0/1 (0%)
+2026-08-07T04:14:43.795Z,vectra-ai/qdrant,2026-08-07T04:14:43.795060Z  INFO collection::shards::local_shard: Recovered collection vectra-kb: 1/1 (100%)
+2026-08-07T04:14:43.796Z,vectra-ai/qdrant,2026-08-07T04:14:43.795920Z  INFO qdrant: Distributed mode disabled
+2026-08-07T04:14:43.796Z,vectra-ai/qdrant,"2026-08-07T04:14:43.796000Z  INFO qdrant: Telemetry reporting enabled, id: 87dc54fd-c38a-4188-9a97-494406cf325c"
+2026-08-07T04:14:43.859Z,vectra-ai/qdrant,"2026-08-07T04:14:43.858983Z  INFO qdrant::actix: REST transport settings: keep_alive=5s, client_request_timeout=5s, client_disconnect_timeout=5s"
+2026-08-07T04:14:43.859Z,vectra-ai/qdrant,2026-08-07T04:14:43.859041Z  INFO qdrant::actix: TLS disabled for REST API
+2026-08-07T04:14:43.859Z,vectra-ai/qdrant,2026-08-07T04:14:43.859226Z  INFO qdrant::actix: Qdrant HTTP listening on 6333
+2026-08-07T04:14:43.859Z,vectra-ai/qdrant,2026-08-07T04:14:43.859251Z  INFO actix_server::builder: starting 15 workers
+2026-08-07T04:14:43.859Z,vectra-ai/qdrant,2026-08-07T04:14:43.859311Z  INFO actix_server::server: Actix runtime found; starting in Actix runtime
+2026-08-07T04:14:43.859Z,vectra-ai/qdrant,"2026-08-07T04:14:43.859372Z  INFO actix_server::server: starting service: ""actix-web-service-0.0.0.0:6333"", workers: 15, listening on: 0.0.0.0:6333"
+2026-08-07T04:14:43.867Z,vectra-ai/qdrant,2026-08-07T04:14:43.865751Z  INFO qdrant::tonic: Qdrant gRPC listening on 6334
+2026-08-07T04:14:43.867Z,vectra-ai/qdrant,2026-08-07T04:14:43.866039Z  INFO qdrant::tonic: TLS disabled for gRPC API
+2026-08-07T04:14:46.375Z,vectra-ai/n8n,Initializing n8n process
+2026-08-07T04:14:47.433Z,vectra-ai/n8n,"n8n ready on ::, port 5678"
+2026-08-07T04:14:47.480Z,vectra-ai/n8n,"n8n Task Broker ready on 127.0.0.1, port 5679"
+2026-08-07T04:14:47.525Z,vectra-ai/n8n,Failed to start Python task runner in internal mode. because Python 3 is missing from this system. Launching a Python runner in internal mode is intended only for debugging and is not recommended for production. Users are encouraged to deploy in external mode. See: https://docs.n8n.io/hosting/configuration/task-runners/#setting-up-external-mode
+2026-08-07T04:14:47.612Z,vectra-ai/n8n,
+2026-08-07T04:14:47.612Z,vectra-ai/n8n,There are deprecations related to your n8n setup. Please take the recommended actions to update your configuration:
+2026-08-07T04:14:47.612Z,vectra-ai/n8n, - N8N_UNVERIFIED_PACKAGES_ENABLED -> The default for this variable will change to `false` in a future version. Set it to `true` explicitly to keep installing unverified community packages.
+2026-08-07T04:14:47.612Z,vectra-ai/n8n, - N8N_RUNNERS_TASK_TIMEOUT -> The default for this variable will be reduced from 300 (5 minutes) to 60 (1 minute) in a future version. Set it explicitly to keep your current task timeout.
+2026-08-07T04:14:47.612Z,vectra-ai/n8n, - N8N_COMPRESSION_NODE_MAX_DECOMPRESSED_SIZE_BYTES -> The default for this variable will be reduced from 2 GiB to 256 MiB in a future version. Set it explicitly to keep your current limit.
+2026-08-07T04:14:47.612Z,vectra-ai/n8n, - N8N_COMPRESSION_NODE_MAX_ZIP_ENTRIES -> The default for this variable will be reduced from 5000 to 1000 in a future version. Set it explicitly to keep your current limit.
+2026-08-07T04:14:47.612Z,vectra-ai/n8n,
+2026-08-07T04:14:47.630Z,vectra-ai/n8n,[license SDK] Skipping renewal on init: license cert is not initialized
+2026-08-07T04:14:49.097Z,vectra-ai/n8n,"Registered runner ""JS Task Runner"" (rZuRAK0cVeU840bNERnF7) "
+2026-08-07T04:14:49.673Z,vectra-ai/n8n,Instance registered
+2026-08-07T04:14:49.678Z,vectra-ai/n8n,Discovered 4 cluster checks
+2026-08-07T04:14:50.685Z,vectra-ai/n8n,Version: 2.31.6
+2026-08-07T04:14:50.685Z,vectra-ai/n8n,Building workflow dependency index...
+2026-08-07T04:14:50.704Z,vectra-ai/n8n,"Finished building workflow dependency index. Processed 0 draft workflows, 0 published workflows."
+2026-08-07T04:14:50.704Z,vectra-ai/n8n,
+2026-08-07T04:14:50.704Z,vectra-ai/n8n,Editor is now accessible via:
+2026-08-07T04:14:50.704Z,vectra-ai/n8n,http://localhost:5678
+2026-08-07T04:14:58.076Z,vectra-ai/n8n,(node:7) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+2026-08-07T04:14:58.076Z,vectra-ai/n8n,(Use `node --trace-deprecation ...` to show where the warning was created)
+2026-08-07T15:14:00.311Z,vectra-ai/qdrant,           _                 _    
+2026-08-07T15:14:00.312Z,vectra-ai/qdrant,  __ _  __| |_ __ __ _ _ __ | |_  
+2026-08-07T15:14:00.312Z,vectra-ai/qdrant, / _` |/ _` | '__/ _` | '_ \| __| 
+2026-08-07T15:14:00.312Z,vectra-ai/qdrant,| (_| | (_| | | | (_| | | | | |_  
+2026-08-07T15:14:00.312Z,vectra-ai/qdrant," \__, |\__,_|_|  \__,_|_| |_|\__| "
+2026-08-07T15:14:00.312Z,vectra-ai/qdrant,    |_|                           
+2026-08-07T15:14:00.312Z,vectra-ai/qdrant,
+2026-08-07T15:14:00.312Z,vectra-ai/qdrant,"Version: 1.18.3, build: db8fa43f"
+2026-08-07T15:14:00.312Z,vectra-ai/qdrant,Access web UI at http://localhost:6333/dashboard
+2026-08-07T15:14:00.312Z,vectra-ai/qdrant,Agentic Skills: https://skills.qdrant.tech/
+2026-08-07T15:14:00.312Z,vectra-ai/qdrant,
+2026-08-07T15:14:00.326Z,vectra-ai/qdrant,2026-08-07T15:14:00.325649Z  INFO storage::content_manager::consensus::persistent: Loading raft state from ./storage/raft_state.json
+2026-08-07T15:14:00.356Z,vectra-ai/qdrant,2026-08-07T15:14:00.355656Z  INFO storage::content_manager::toc: Loading collection: vectra-kb
+2026-08-07T15:14:00.722Z,vectra-ai/qdrant,2026-08-07T15:14:00.719776Z  INFO collection::shards::local_shard: Recovering shard ./storage/collections/vectra-kb/0: 0/1 (0%)
+2026-08-07T15:14:00.841Z,vectra-ai/qdrant,2026-08-07T15:14:00.841252Z  INFO collection::shards::local_shard: Recovered collection vectra-kb: 1/1 (100%)
+2026-08-07T15:14:00.851Z,vectra-ai/qdrant,2026-08-07T15:14:00.851252Z  INFO qdrant: Distributed mode disabled
+2026-08-07T15:14:00.851Z,vectra-ai/qdrant,"2026-08-07T15:14:00.851359Z  INFO qdrant: Telemetry reporting enabled, id: 7db10fb8-fe0a-4c2b-a9b6-b4e8d6794881"
+2026-08-07T15:14:01.041Z,vectra-ai/qdrant,"2026-08-07T15:14:01.041317Z  INFO qdrant::actix: REST transport settings: keep_alive=5s, client_request_timeout=5s, client_disconnect_timeout=5s"
+2026-08-07T15:14:01.041Z,vectra-ai/qdrant,2026-08-07T15:14:01.041407Z  INFO qdrant::actix: TLS disabled for REST API
+2026-08-07T15:14:01.042Z,vectra-ai/qdrant,2026-08-07T15:14:01.041834Z  INFO qdrant::actix: Qdrant HTTP listening on 6333
+2026-08-07T15:14:01.042Z,vectra-ai/qdrant,2026-08-07T15:14:01.041921Z  INFO actix_server::builder: starting 15 workers
+2026-08-07T15:14:01.042Z,vectra-ai/qdrant,2026-08-07T15:14:01.042021Z  INFO actix_server::server: Actix runtime found; starting in Actix runtime
+2026-08-07T15:14:01.042Z,vectra-ai/qdrant,"2026-08-07T15:14:01.042052Z  INFO actix_server::server: starting service: ""actix-web-service-0.0.0.0:6333"", workers: 15, listening on: 0.0.0.0:6333"
+2026-08-07T15:14:01.069Z,vectra-ai/qdrant,2026-08-07T15:14:01.069253Z  INFO qdrant::tonic: Qdrant gRPC listening on 6334
+2026-08-07T15:14:01.069Z,vectra-ai/qdrant,2026-08-07T15:14:01.069288Z  INFO qdrant::tonic: TLS disabled for gRPC API
+2026-08-07T15:14:17.324Z,vectra-ai/n8n,Last session crashed
+2026-08-07T15:14:27.590Z,vectra-ai/n8n,Initializing n8n process
+2026-08-07T15:14:30.231Z,vectra-ai/n8n,"n8n ready on ::, port 5678"
+2026-08-07T15:14:30.325Z,vectra-ai/n8n,"n8n Task Broker ready on 127.0.0.1, port 5679"
+2026-08-07T15:14:30.435Z,vectra-ai/n8n,Failed to start Python task runner in internal mode. because Python 3 is missing from this system. Launching a Python runner in internal mode is intended only for debugging and is not recommended for production. Users are encouraged to deploy in external mode. See: https://docs.n8n.io/hosting/configuration/task-runners/#setting-up-external-mode
+2026-08-07T15:14:30.714Z,vectra-ai/n8n,
+2026-08-07T15:14:30.714Z,vectra-ai/n8n,There are deprecations related to your n8n setup. Please take the recommended actions to update your configuration:
+2026-08-07T15:14:30.714Z,vectra-ai/n8n, - N8N_UNVERIFIED_PACKAGES_ENABLED -> The default for this variable will change to `false` in a future version. Set it to `true` explicitly to keep installing unverified community packages.
+2026-08-07T15:14:30.714Z,vectra-ai/n8n, - N8N_RUNNERS_TASK_TIMEOUT -> The default for this variable will be reduced from 300 (5 minutes) to 60 (1 minute) in a future version. Set it explicitly to keep your current task timeout.
+2026-08-07T15:14:30.714Z,vectra-ai/n8n, - N8N_COMPRESSION_NODE_MAX_DECOMPRESSED_SIZE_BYTES -> The default for this variable will be reduced from 2 GiB to 256 MiB in a future version. Set it explicitly to keep your current limit.
+2026-08-07T15:14:30.714Z,vectra-ai/n8n, - N8N_COMPRESSION_NODE_MAX_ZIP_ENTRIES -> The default for this variable will be reduced from 5000 to 1000 in a future version. Set it explicitly to keep your current limit.
+2026-08-07T15:14:30.714Z,vectra-ai/n8n,
+2026-08-07T15:14:30.750Z,vectra-ai/n8n,[license SDK] Skipping renewal on init: license cert is not initialized
+2026-08-07T15:14:33.986Z,vectra-ai/n8n,"Registered runner ""JS Task Runner"" (PX7gSZxFB8g4XH1rZXCpf) "
+2026-08-07T15:14:35.598Z,vectra-ai/n8n,Instance registered
+2026-08-07T15:14:35.611Z,vectra-ai/n8n,Discovered 4 cluster checks
+2026-08-07T15:14:38.140Z,vectra-ai/n8n,Version: 2.31.6
+2026-08-07T15:14:38.141Z,vectra-ai/n8n,Building workflow dependency index...
+2026-08-07T15:14:38.192Z,vectra-ai/n8n,
+2026-08-07T15:14:38.193Z,vectra-ai/n8n,Editor is now accessible via:
+2026-08-07T15:14:38.193Z,vectra-ai/n8n,http://localhost:5678
+2026-08-07T15:14:38.193Z,vectra-ai/n8n,"Finished building workflow dependency index. Processed 0 draft workflows, 0 published workflows."
+2026-08-07T15:15:07.038Z,vectra-ai/n8n,(node:7) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+2026-08-07T15:15:07.039Z,vectra-ai/n8n,(Use `node --trace-deprecation ...` to show where the warning was created)
+2026-08-08T04:16:53.359Z,vectra-ai/qdrant,"2026-08-08T04:16:53.351810Z  INFO actix_web::middleware::logger: 172.19.0.1 ""GET /favicon.ico HTTP/1.1"" 404 0 ""http://localhost:6333/"" ""Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"" 0.008300"
