@@ -2,57 +2,51 @@
 
 > Enterprise Retrieval-Augmented Generation (RAG) Assistant for Logistics Knowledge Management
 
-![Status](https://img.shields.io/badge/status-in%20development-green)
-![Version](https://img.shields.io/badge/version-v0.4.0-blue)
-![Python](https://img.shields.io/badge/python-3.12-blue)
-![Docker](https://img.shields.io/badge/docker-ready-2496ED)
-![n8n](https://img.shields.io/badge/n8n-workflows-EA4B71)
-![Qdrant](https://img.shields.io/badge/Qdrant-vector%20database-red)
-![Groq](https://img.shields.io/badge/Groq-LLM-black)
-![Gemini](https://img.shields.io/badge/Google-Gemini-blue)
-
 ---
 
 # Executive Summary
 
-Vectra AI is an enterprise-oriented Retrieval-Augmented Generation (RAG) assistant designed to answer logistics-related questions using a curated corporate knowledge base.
+Vectra AI is an enterprise Retrieval-Augmented Generation (RAG) assistant designed to answer logistics-related questions using a curated corporate knowledge base.
 
-Instead of relying exclusively on Large Language Models, the assistant retrieves semantically relevant information from indexed corporate documentation before generating responses. This approach significantly reduces hallucinations while providing contextual, traceable and reliable answers.
+Instead of relying solely on a Large Language Model, the assistant retrieves semantically relevant information from indexed corporate documentation before generating responses. This approach reduces hallucinations while providing contextual, traceable and grounded answers.
 
-The project combines workflow automation, vector search and modern LLMs to simulate a real-world enterprise knowledge assistant.
+The project combines workflow automation, vector search, cloud infrastructure and modern AI models to simulate a real-world enterprise knowledge assistant.
 
 ---
 
 # Current Status
 
 | Property | Value |
-|-----------|-------|
-| Status | 🟢 In Development |
-| Current Version | **v0.6.0** |
+|----------|-------|
+| Status | 🟢 Active Development |
+| Current Version | **v0.7.0** |
 | Architecture | Enterprise Retrieval-Augmented Generation |
-| Development Stage | Functional RAG Prototype |
-| Cloud Deployment | Planned (Oracle Cloud Infrastructure) |
+| Development Stage | Cloud-Deployed RAG Solution |
+| Cloud Deployment | ✅ Oracle Cloud Infrastructure |
+| Public Access | ✅ Cloudflare Tunnel (HTTPS) |
 
 ## Development Progress
 
 | Component | Status |
-|-----------|--------|
+|-----------|:------:|
 | Docker Environment | ✅ Completed |
 | Corporate Knowledge Base | ✅ Completed |
 | Automated PDF Generator | ✅ Completed |
 | Qdrant Vector Database | ✅ Completed |
 | Knowledge Base Ingestion Workflow | ✅ Completed |
-| Gemini Embeddings | ✅ Completed |
-| RAG Query Workflow | ✅ Completed |
+| Google Gemini Embeddings | ✅ Completed |
+| Groq LLM Integration | ✅ Completed |
+| RAG Query Engine | ✅ Completed |
 | Vectra AI Assistant | ✅ Completed |
-| Telegram Integration | ⏳ Planned |
-| Oracle Cloud Deployment | ⏳ Planned |
+| Oracle Cloud Deployment | ✅ Completed |
+| Cloudflare Tunnel | ✅ Completed |
+| Telegram Integration | 🚧 In Progress |
 
 ---
 
 # Why Vectra AI?
 
-Corporate knowledge is frequently distributed across multiple documents, making information retrieval inefficient and difficult to maintain.
+Corporate knowledge is frequently distributed across multiple documents, making information retrieval inefficient, inconsistent and difficult to maintain.
 
 Vectra AI addresses this challenge by combining semantic search, Retrieval-Augmented Generation (RAG), workflow automation and vector databases to provide accurate, grounded and traceable answers based exclusively on corporate documentation.
 
@@ -72,53 +66,69 @@ Knowledge Processing
 AI Orchestration
         │
         ▼
-Response Generation
+Grounded Response Generation
 ```
 
 This layered architecture separates knowledge ingestion from user interaction, allowing the documentation to evolve independently from the conversational assistant.
 
 ---
 
-# Solution Architecture
+# Production Architecture
 
-![Solution Architecture](diagrams/exports/png/01-solution-architecture.png)
+```text
+                    User
+                      │
+                      ▼
+             Cloudflare Tunnel
+                 (HTTPS)
+                      │
+                      ▼
+        Oracle Cloud Infrastructure
+                      │
+                      ▼
+                     n8n
+            ┌─────────┼─────────┐
+            │         │         │
+            ▼         ▼         ▼
+        Qdrant      Groq     Gemini
+     Vector Store    LLM    Embeddings
+            │
+            ▼
+ Corporate Knowledge Base
+```
 
-The solution is composed of four major components:
+The production environment runs inside an Oracle Cloud compute instance using Docker containers.
 
-- Corporate Knowledge Base
-- Vector Database (Qdrant)
-- AI Orchestration (n8n)
-- Response Generation (Groq)
+Cloudflare Tunnel provides secure HTTPS access to n8n without requiring direct public exposure of the application port.
 
 ---
 
 # RAG Query Flow
 
-![RAG Query Flow](diagrams/exports/png/02-rag-query-flow.png)
-
 The Retrieval-Augmented Generation workflow performs the following steps:
 
 1. The user submits a question.
 2. The AI Agent determines whether the corporate knowledge base should be queried.
-3. Google Gemini generates the semantic embedding for the user question.
+3. Google Gemini generates the semantic embedding for the question.
 4. Qdrant retrieves the most relevant document chunks.
 5. Groq generates a grounded response using the retrieved context.
-6. The assistant returns the answer together with the corresponding source whenever available.
+6. The assistant returns the answer together with source attribution whenever available.
 
 ---
 
 # Technology Stack
 
 | Layer | Technology |
-|--------|------------|
+|------|------------|
 | Programming Language | Python |
 | Workflow Automation | n8n |
 | Vector Database | Qdrant |
 | Embeddings | Google Gemini |
 | Large Language Model | Groq |
 | Containerization | Docker |
+| Cloud Infrastructure | Oracle Cloud Infrastructure |
+| Secure Public Access | Cloudflare Tunnel |
 | Documentation | Markdown + Python |
-| Cloud Deployment | Oracle Cloud Infrastructure (Planned) |
 
 ---
 
@@ -127,36 +137,37 @@ The Retrieval-Augmented Generation workflow performs the following steps:
 ```text
 vectra-ai/
 
-assets/
-deployment/
-diagrams/
-docs/
-│
-├── source/
-├── pdf/
-└── ai/
-
-screenshots/
-scripts/
-tests/
-workflows/
-
-docker-compose.yml
-README.md
-requirements.txt
+├── assets/
+├── deployment/
+│   ├── docker/
+│   └── oci/
+├── diagrams/
+├── docs/
+├── screenshots/
+├── scripts/
+├── tests/
+├── workflows/
+│   ├── 01 - Knowledge Base Ingestion.json
+│   └── 02 - RAG Query Engine.json
+├── .dockerignore
+├── .env.example
+├── .gitignore
+├── docker-compose.yml
+├── Dockerfile
+├── railway.json
+├── README.md
+└── requirements.txt
 ```
 
 ---
 
 # Engineering Decisions
 
-The project was intentionally designed following software engineering principles commonly adopted in enterprise AI systems.
-
 ## Markdown as the Single Source of Truth
 
-All corporate documentation is maintained in Markdown.
+Corporate documentation is maintained in Markdown.
 
-PDF documents are automatically generated from Markdown, ensuring consistency while simplifying future maintenance.
+PDF files are automatically generated from Markdown, ensuring consistency while simplifying future maintenance.
 
 ---
 
@@ -168,26 +179,42 @@ This separation allows the knowledge base to be updated without affecting runtim
 
 ---
 
-## Dedicated Embedding Model
+## Dedicated AI Models
 
-Google Gemini is used exclusively for semantic embedding generation.
+Google Gemini is used for semantic embedding generation.
 
-Groq is dedicated to response generation, allowing each model to perform the task for which it is best suited.
+Groq is used for response generation.
+
+This separation allows each model to perform the task for which it is best suited.
 
 ---
 
-## Containerized Development
+## Containerized Environments
 
-The entire development environment runs inside Docker Compose.
+Development and production environments are containerized with Docker.
 
-This guarantees reproducibility across different machines and simplifies deployment.
+The local environment uses the root Docker Compose configuration, while production uses dedicated deployment files under:
+
+```text
+deployment/docker/
+```
+
+This separation allows production-specific configuration without affecting local development.
+
+---
+
+## Secure Production Access
+
+The production deployment uses Cloudflare Tunnel to provide HTTPS access to n8n.
+
+This avoids direct public exposure of the n8n application port and provides a secure endpoint for external integrations.
 
 ---
 
 # Core Components
 
 | Component | Description |
-|-----------|-------------|
+|----------|-------------|
 | Corporate Knowledge Base | Business documentation maintained in Markdown |
 | Documentation Builder | Automatic PDF generation pipeline |
 | Knowledge Base Ingestion | Reads and indexes corporate documents |
@@ -201,26 +228,32 @@ This guarantees reproducibility across different machines and simplifies deploym
 # Implemented Workflows
 
 | Workflow | Purpose | Status |
-|-----------|----------|--------|
-| 01 - Knowledge Base Ingestion | Reads corporate PDF documents, generates embeddings and stores vectors inside Qdrant | ✅ |
+|----------|---------|:------:|
+| 01 - Knowledge Base Ingestion | Reads corporate PDFs, generates embeddings and stores vectors in Qdrant | ✅ |
 | 02 - RAG Query Engine | Retrieves corporate knowledge and generates grounded responses | ✅ |
-| 03 - Telegram Assistant | Conversational interface | ⏳ |
-| 04 - OCI Deployment | Cloud deployment | ⏳ |
+| 03 - Telegram Assistant | External conversational interface | 🚧 |
 
 ---
 
 # Knowledge Base Ingestion
 
-![Knowledge Ingestion](diagrams/exports/png/03-knowledge-ingestion.png)
-
 The ingestion workflow performs:
 
 - Reading PDF documents
 - Extracting document content
-- Splitting text into semantic chunks
+- Splitting text into chunks
 - Generating embeddings using Google Gemini
 - Associating metadata
 - Storing vectors in Qdrant
+
+The production validation confirmed:
+
+```text
+Qdrant collection: vectra-kb
+Points stored: 50
+Status: OK
+Optimizer status: OK
+```
 
 ---
 
@@ -230,47 +263,134 @@ The Vectra AI Assistant is the conversational layer of the platform.
 
 It answers questions exclusively using information retrieved from the corporate knowledge base.
 
-The assistant follows four fundamental principles:
+The assistant follows five fundamental principles:
 
-- Retrieval before generation.
-- Grounded responses.
-- Source attribution whenever available.
-- Graceful fallback when no relevant information is found.
+- Retrieval before generation
+- Grounded responses
+- Source attribution whenever available
+- Graceful fallback when no relevant information is found
+- No external knowledge outside the configured corporate scope
+
+---
+
+# Validation Results
+
+The cloud deployment has been validated through end-to-end tests.
+
+- ✅ Knowledge base ingestion completed successfully
+- ✅ 50 document chunks persisted in Qdrant
+- ✅ Semantic retrieval operational
+- ✅ Gemini embeddings operational
+- ✅ Groq response generation operational
+- ✅ Source attribution validated
+- ✅ Out-of-domain rejection validated
+- ✅ HTTPS access through Cloudflare Tunnel
+
+Example in-domain query:
+
+```text
+User:
+quero saber sobre a politica de extravios
+```
+
+The assistant retrieved the appropriate corporate documentation and returned a grounded response with source attribution.
+
+Example out-of-domain query:
+
+```text
+User:
+quem ganhou a copa do mundo?
+```
+
+The assistant correctly declined to answer because the requested information was not present in the corporate knowledge base.
+
+---
+
+# Production Deployment
+
+Vectra AI has been successfully deployed on Oracle Cloud Infrastructure.
+
+The production environment includes:
+
+- Oracle Cloud Compute Instance
+- Ubuntu Server
+- Docker Engine
+- Docker Compose
+- n8n
+- Qdrant
+- Google Gemini Embeddings
+- Groq LLM
+- Cloudflare Tunnel
+
+Detailed deployment documentation is available in:
+
+```text
+deployment/
+├── README.md
+└── oci/
+    └── README.md
+```
 
 ---
 
 # Running Locally
 
-Clone the repository.
+Clone the repository:
 
 ```bash
 git clone https://github.com/francellymca/vectra-ai.git
+cd vectra-ai
 ```
 
-Start the Docker environment.
+Start the Docker environment:
 
 ```bash
 docker compose up -d
 ```
 
-Open n8n.
+Open n8n:
 
 ```text
 http://localhost:5678
 ```
 
-Execute:
+Then execute:
 
-1. Workflow 01 – Knowledge Base Ingestion.
-2. Workflow 02 – RAG Query Engine.
+1. `01 - Knowledge Base Ingestion`
+2. `02 - RAG Query Engine`
+
+---
+
+# Environment Configuration
+
+Development and production configurations are separated.
+
+```text
+.env
+```
+
+is used for local development.
+
+Production configuration is maintained separately under:
+
+```text
+deployment/docker/.env.production
+```
+
+Sensitive environment files are not intended to be committed to the repository.
+
+Templates are provided through:
+
+```text
+.env.example
+deployment/docker/.env.production.example
+```
 
 ---
 
 # Architecture Documentation
 
-The repository includes detailed architectural documentation covering every major component of the solution.
-
-Available diagrams include:
+The repository includes documentation covering:
 
 - Solution Architecture
 - Knowledge Ingestion Pipeline
@@ -278,6 +398,12 @@ Available diagrams include:
 - Local Development Architecture
 - Oracle Cloud Deployment Architecture
 - Runtime Sequence Diagram
+
+For deployment-specific documentation, see:
+
+```text
+deployment/
+```
 
 ---
 
@@ -289,17 +415,20 @@ Available diagrams include:
 - [x] Automated PDF generation
 - [x] Qdrant integration
 - [x] Knowledge ingestion workflow
+- [x] Google Gemini embeddings
+- [x] Groq integration
 - [x] Retrieval-Augmented Generation
 - [x] Vectra AI Assistant
+- [x] Oracle Cloud deployment
+- [x] Cloudflare Tunnel
 - [ ] Telegram integration
-- [ ] Oracle Cloud deployment
-- [ ] Final demonstration
-- [ ] Production documentation
+- [ ] Final screenshots and demonstration
+- [ ] Final production documentation
 
 ---
 
 # Project Scope
 
-Vectra AI is an educational and portfolio project focused on exploring enterprise Retrieval-Augmented Generation (RAG), workflow automation and cloud-native AI architectures.
+Vectra AI is an educational and portfolio project focused on enterprise Retrieval-Augmented Generation (RAG), workflow automation, cloud infrastructure and modern AI engineering practices.
 
-Rather than providing a production-ready application, the project emphasizes software engineering principles, maintainability, modular architecture and practical AI integration strategies commonly found in enterprise environments.
+The project emphasizes modular architecture, maintainability, reproducibility, observability and practical integration patterns commonly adopted in enterprise AI systems.
