@@ -1,14 +1,12 @@
 # Oracle Cloud Infrastructure Deployment
 
-This document describes the deployment of Vectra AI on Oracle Cloud Infrastructure (OCI).
+This document describes the production deployment of **Vectra AI** on **Oracle Cloud Infrastructure (OCI)**.
 
-The production environment hosts the n8n orchestration layer and the Qdrant vector database inside Docker containers running on an Ubuntu compute instance.
-
-The deployment has been validated with the complete Retrieval-Augmented Generation (RAG) pipeline.
+The production environment hosts the complete Retrieval-Augmented Generation (RAG) platform, including Docker, n8n, Qdrant, Cloudflare Tunnel and the Telegram AI Assistant.
 
 ---
 
-## Deployment Status
+# Deployment Status
 
 | Component | Status |
 |-----------|:------:|
@@ -24,48 +22,48 @@ The deployment has been validated with the complete Retrieval-Augmented Generati
 | Knowledge Base Ingestion | ✅ Validated |
 | RAG Query Engine | ✅ Validated |
 | Cloudflare HTTPS Tunnel | ✅ Validated |
-| Telegram Integration | 🚧 In Progress |
-| Deployment Evidence | 🚧 In Progress |
+| Telegram Integration | ✅ Validated |
+| Deployment Evidence | ✅ Completed |
 
 ---
 
 # Production Architecture
 
 ```text
-                    Internet
-                       │
-                       ▼
-              Cloudflare Tunnel
-                   HTTPS
-                       │
-                       ▼
-             OCI Compute Instance
-                       │
-                       ▼
-                localhost:5678
-                       │
-                       ▼
-                      n8n
-                Docker Container
-                 │           │
-                 │           │
-                 ▼           ▼
-              Qdrant       External AI APIs
-            Vector DB      ├── Gemini Embeddings
-                           └── Groq LLM
+                 Internet
+                      │
+                      ▼
+             Cloudflare Tunnel
+                  HTTPS
+                      │
+                      ▼
+            OCI Compute Instance
+                      │
+               Docker Compose
+                      │
+          ┌───────────┴───────────┐
+          ▼                       ▼
+        n8n                   Qdrant
+          │
+          ▼
+   Gemini Embeddings
+          │
+          ▼
+      Groq LLM
+          │
+          ▼
+ Telegram AI Assistant
 ```
 
-The application runs on an Oracle Cloud compute instance using Docker Compose.
-
-Cloudflare Tunnel provides HTTPS access to the n8n interface without requiring direct exposure of the n8n application port to the public Internet.
-
-Qdrant remains isolated inside the Docker network and is accessed internally by n8n.
+The application runs on an Oracle Cloud Infrastructure Ubuntu compute instance using Docker Compose. External HTTPS connectivity is provided through Cloudflare Tunnel without exposing the n8n application directly to the Internet.
 
 ---
 
 # OCI Compute Instance
 
-The current deployment uses an Oracle Cloud compute instance with:
+![OCI Compute Instance](../../assets/screenshots/oci/oci-instance-deploy.png)
+
+The Oracle Cloud Infrastructure Compute Instance hosts the complete Vectra AI production environment, including Docker, n8n, Qdrant and Cloudflare Tunnel.
 
 | Property | Configuration |
 |----------|---------------|
@@ -78,8 +76,6 @@ The current deployment uses an Oracle Cloud compute instance with:
 | Private Subnet Addressing | Enabled |
 | SSH Authentication | Public Key |
 
-The application containers run directly on this instance using Docker Compose.
-
 ---
 
 # Network Architecture
@@ -87,52 +83,17 @@ The application containers run directly on this instance using Docker Compose.
 The OCI environment includes:
 
 - Virtual Cloud Network (VCN)
-- Public subnet
-- Private subnet
+- Public Subnet
+- Private Subnet
 - Internet Gateway
 - Route Table
 - Security List
-- Public IPv4 address
+- Public IPv4 Address
 - Primary VNIC
 
 The compute instance is attached to the public subnet.
 
-The route table includes Internet access through the OCI Internet Gateway.
-
----
-
-# HTTP Connectivity Investigation
-
-During deployment, direct inbound HTTP access through TCP port 80 resulted in connection timeouts even after validating the major network and operating system components.
-
-The following components were verified:
-
-- Public subnet
-- Internet Gateway
-- Route Table
-- Security List
-- Public IPv4 assignment
-- Primary VNIC
-- Ubuntu network interface
-- Nginx listening on `0.0.0.0:80`
-- Local HTTP connectivity
-- Host firewall rules
-
-Local tests confirmed that Nginx responded correctly through both:
-
-```text
-http://localhost
-```
-
-and:
-
-```text
-http://<private-ip>
-```
-
-Since the application itself and the OCI network configuration were validated, the deployment strategy was changed to use Cloudflare Tunnel for secure external access.
-
-This avoids exposing the n8n application port directly and provides an HTTPS endpoint suitable for external integrations.
+Instead of exposing n8n directly to the Internet, HTTPS access is provided through Cloudflare Tunnel.
 
 ---
 
@@ -150,13 +111,13 @@ Production environment variables are stored separately in:
 deployment/docker/.env.production
 ```
 
-The production environment file is not intended to be committed to source control.
-
 A template is provided through:
 
 ```text
 deployment/docker/.env.production.example
 ```
+
+Sensitive information is never committed to the repository.
 
 ---
 
@@ -171,13 +132,13 @@ docker compose \
   up -d
 ```
 
-Verify the containers:
+Verify running containers:
 
 ```bash
 docker ps
 ```
 
-Expected services:
+Expected containers:
 
 ```text
 vectra-n8n
@@ -188,19 +149,17 @@ vectra-qdrant
 
 # Container Architecture
 
-The production stack contains two primary containers.
-
 ## n8n
 
 Responsible for:
 
 - Workflow orchestration
-- Knowledge ingestion
-- RAG execution
+- Knowledge Base ingestion
 - AI Agent execution
-- External integrations
+- Telegram integration
+- RAG Query Engine
 
-The n8n service listens internally on:
+Internal port:
 
 ```text
 5678
@@ -213,12 +172,12 @@ The n8n service listens internally on:
 Responsible for:
 
 - Vector persistence
-- Semantic search
-- Retrieval of relevant knowledge chunks
+- Semantic retrieval
+- Knowledge search
 
-Qdrant is not exposed directly to the public Internet.
+Qdrant is only accessible from inside the Docker network.
 
-The n8n container communicates with Qdrant through the Docker network using:
+Communication occurs through:
 
 ```text
 http://vectra-qdrant:6333
@@ -228,15 +187,13 @@ http://vectra-qdrant:6333
 
 # Docker Network
 
-Both containers are connected to the same private Docker bridge network.
+Both services share the same Docker bridge network.
 
 ```text
 vectra-ai_vectra-network
 ```
 
-This allows service-to-service communication using container names.
-
-Example:
+Service communication:
 
 ```text
 n8n
@@ -246,34 +203,30 @@ n8n
 Qdrant
 ```
 
-This architecture avoids exposing the Qdrant API outside the container network.
-
 ---
 
 # Persistent Storage
 
-Docker volumes are used to persist application data.
+Docker volumes:
 
 ```text
 vectra-ai_n8n_data
 vectra-ai_qdrant_storage
 ```
 
-These volumes preserve:
+Persistent data includes:
 
-- n8n configuration
-- n8n workflows created in the production instance
-- encrypted credentials
-- Qdrant collections
-- vector data
-
-Container recreation therefore does not remove persistent application data.
+- n8n workflows
+- Credentials
+- Encryption data
+- Vector collections
+- Knowledge embeddings
 
 ---
 
 # Production Environment Variables
 
-The production environment uses a dedicated configuration file.
+The deployment uses a dedicated production environment file.
 
 Important variables include:
 
@@ -289,107 +242,79 @@ N8N_ENCRYPTION_KEY
 N8N_SECURE_COOKIE
 ```
 
-The production deployment currently uses:
+Current deployment:
 
 ```text
 N8N_PORT=5678
 N8N_PROTOCOL=https
 ```
 
-The public host values correspond to the active Cloudflare Tunnel endpoint.
-
-> The active Quick Tunnel URL is temporary and should not be committed to the repository.
+The public host corresponds to the active Cloudflare Tunnel endpoint.
 
 ---
 
 # Security
 
-The production deployment follows several security principles.
-
 ## n8n Encryption Key
 
-The n8n encryption key is maintained only in the production environment file.
+The encryption key exists only inside the production environment.
 
-It must remain unchanged after credentials have been created because n8n uses it to encrypt stored credentials.
+It must never be changed after credentials have been created.
 
 ---
 
 ## Secrets
 
-The following values must never be committed:
+The following items are never committed:
 
-- Gemini API keys
-- Groq API keys
-- Telegram bot tokens
-- n8n encryption keys
-- authentication passwords
-- SSH private keys
+- Gemini API Key
+- Groq API Key
+- Telegram Bot Token
+- Encryption Key
+- Passwords
+- SSH Private Keys
 
 ---
 
 ## Qdrant Isolation
 
-Qdrant is not mapped to a public host port in the production Docker configuration.
+Qdrant is not exposed publicly.
 
-Only services inside the Docker network can access it.
+Only Docker services can access the Vector Database.
 
 ---
 
 ## SSH
 
-Administrative access to the OCI instance uses SSH public-key authentication.
-
-Private SSH keys must remain outside the repository.
+Administrative access is performed exclusively using SSH public-key authentication.
 
 ---
 
 # Cloudflare Tunnel
 
-Cloudflare Tunnel was introduced to provide secure external HTTPS connectivity to n8n.
+Cloudflare Tunnel provides secure HTTPS connectivity without exposing internal application ports.
 
-The current validation environment uses a Cloudflare Quick Tunnel.
-
-Example command:
+Current validation uses:
 
 ```bash
 cloudflared tunnel --url http://localhost:5678
 ```
 
-The tunnel creates a temporary HTTPS endpoint similar to:
+The tunnel generates a temporary HTTPS endpoint similar to:
 
 ```text
 https://<generated-name>.trycloudflare.com
 ```
 
-Cloudflare establishes the tunnel through an outbound connection from the OCI instance.
-
-Therefore, the n8n application port does not need to be directly exposed to the public Internet.
-
----
-
-## Quick Tunnel Limitation
-
-The current deployment uses a Quick Tunnel for development and demonstration purposes.
-
-The generated hostname changes whenever the tunnel is recreated.
-
-Because of this, the following production variables must be updated when the Quick Tunnel URL changes:
-
-```text
-N8N_HOST
-WEBHOOK_URL
-N8N_EDITOR_BASE_URL
-```
-
-A future production evolution may use a permanent Cloudflare Tunnel with a custom domain.
+Future production deployments may use a permanent tunnel with a custom domain.
 
 ---
 
 # Knowledge Base Deployment
 
-Corporate knowledge PDFs are available inside the n8n container through the configured Docker volume.
+Corporate PDF documents are mounted inside the n8n container.
 
-The Knowledge Base Ingestion workflow reads the files and processes them using:
+The ingestion workflow processes:
 
 ```text
 PDF
@@ -401,25 +326,25 @@ Document Loader
 Text Chunks
  │
  ▼
-Google Gemini Embeddings
+Gemini Embeddings
  │
  ▼
 Qdrant
 ```
 
-The production ingestion workflow has been validated successfully.
+Knowledge ingestion has been successfully validated.
 
 ---
 
 # Qdrant Validation
 
-The production collection is:
+Collection:
 
 ```text
 vectra-kb
 ```
 
-Validation results:
+Validation:
 
 ```text
 status: ok
@@ -427,97 +352,91 @@ optimizer_status: ok
 points_count: 50
 ```
 
-The collection contains 50 vector points generated from the corporate knowledge base.
-
-Because Qdrant is isolated inside the Docker network, validation can be performed from the n8n container.
-
-Example:
-
-```bash
-docker exec vectra-n8n node -e \
-"fetch('http://vectra-qdrant:6333/collections/vectra-kb')
-.then(r => r.json())
-.then(j => console.log(JSON.stringify(j, null, 2)))
-.catch(console.error)"
-```
+The production knowledge base currently contains 50 indexed vector embeddings.
 
 ---
 
-# RAG Validation
+# End-to-End Validation
 
-The production RAG pipeline has been validated end to end.
+The complete production pipeline has been successfully validated.
 
 Validated components:
 
-- Google Gemini embeddings
-- Qdrant semantic retrieval
-- Groq response generation
-- AI Agent orchestration
-- Corporate source attribution
-- Out-of-domain rejection
+- Docker deployment
+- OCI infrastructure
+- Cloudflare Tunnel
+- Gemini Embeddings
+- Qdrant Retrieval
+- Groq LLM
+- n8n AI Agent
+- Telegram Assistant
+- Source Attribution
+- Out-of-domain protection
 
-Example in-domain request:
-
-```text
-quero saber sobre a politica de extravios
-```
-
-The assistant successfully retrieved information from the corporate knowledge base and returned a grounded response with source attribution.
-
-Example out-of-domain request:
+Example in-domain query:
 
 ```text
-quem ganhou a copa do mundo?
+Me fale sobre a política de reembolsos.
 ```
 
-The assistant correctly declined to answer because the requested information was not present in the corporate knowledge base.
+Result:
 
-This behavior confirms that the assistant follows the configured grounding policy.
+- Relevant chunks retrieved
+- Semantic search executed
+- Response generated by Groq
+- Corporate source returned
+
+Example out-of-domain query:
+
+```text
+Quem ganhou a Copa do Mundo?
+```
+
+Result:
+
+The assistant correctly declined the request because the information is not present in the corporate knowledge base.
 
 ---
 
-# Deployment Validation
+# Deployment Validation Checklist
 
-The following deployment tests have been completed successfully:
-
-- [x] OCI compute instance running
-- [x] SSH access
-- [x] Docker installation
-- [x] Docker Compose installation
-- [x] Repository cloned
-- [x] Production environment configured
-- [x] n8n container running
-- [x] Qdrant container running
-- [x] Corporate PDFs accessible inside n8n
-- [x] Gemini credentials configured
-- [x] Groq credentials configured
-- [x] Qdrant connection validated
-- [x] Knowledge ingestion completed
-- [x] 50 vector points persisted
-- [x] RAG query validated
-- [x] Source attribution validated
-- [x] Out-of-domain fallback validated
-- [x] HTTPS access through Cloudflare Tunnel
-- [ ] Telegram webhook integration
-- [ ] Final deployment screenshots
+- [x] OCI Instance
+- [x] Ubuntu Server
+- [x] SSH Access
+- [x] Docker
+- [x] Docker Compose
+- [x] Repository Deployment
+- [x] Production Environment
+- [x] n8n Running
+- [x] Qdrant Running
+- [x] Cloudflare Tunnel
+- [x] Knowledge Base Mounted
+- [x] Knowledge Ingestion
+- [x] Gemini Embeddings
+- [x] Groq Integration
+- [x] Vector Search
+- [x] RAG Validation
+- [x] Telegram Assistant
+- [x] Source Attribution
+- [x] Out-of-domain Protection
 
 ---
 
 # Operational Commands
 
-Check running containers:
+List containers:
 
 ```bash
 docker ps
 ```
 
-Check n8n locally:
+Check n8n:
 
 ```bash
 curl -I http://localhost:5678
 ```
 
-Check container logs:
+View logs:
 
 ```bash
 docker logs vectra-n8n
@@ -527,7 +446,7 @@ docker logs vectra-n8n
 docker logs vectra-qdrant
 ```
 
-Restart the production stack:
+Restart stack:
 
 ```bash
 docker compose \
@@ -536,7 +455,7 @@ docker compose \
   up -d
 ```
 
-Stop the production stack:
+Stop stack:
 
 ```bash
 docker compose \
@@ -547,37 +466,43 @@ docker compose \
 
 ---
 
-# Current Deployment Status
-
-The core Vectra AI infrastructure is operational on Oracle Cloud Infrastructure.
-
-Currently validated:
+# Current Production Environment
 
 ```text
-OCI
+Oracle Cloud Infrastructure
+        │
+        ▼
+Ubuntu 24.04 LTS
+        │
+        ▼
+Docker Compose
+        │
+ ┌──────┴──────┐
+ ▼             ▼
+n8n         Qdrant
  │
- ├── Ubuntu
+ ▼
+Gemini Embeddings
  │
- ├── Docker
- │   ├── n8n
- │   └── Qdrant
+ ▼
+Groq LLM
  │
- ├── Gemini Embeddings
- ├── Groq LLM
+ ▼
+Telegram AI Assistant
  │
- └── Cloudflare Tunnel (HTTPS)
+ ▼
+Corporate Knowledge Base
 ```
 
-The remaining deployment task is the integration of the external Telegram conversational interface.
+The complete production environment has been successfully deployed, validated and documented.
 
 ---
 
-# Next Steps
+# Future Improvements
 
-- [ ] Implement `03 - Telegram Assistant`
-- [ ] Configure Telegram credentials
-- [ ] Configure Telegram webhook
-- [ ] Validate Telegram → RAG → Telegram flow
-- [ ] Export the final workflow
-- [ ] Capture deployment screenshots
-- [ ] Update final project documentation
+- Permanent Cloudflare Tunnel
+- Custom Domain
+- CI/CD Pipeline
+- Monitoring and Observability
+- Automated Production Backups
+- High Availability Deployment
