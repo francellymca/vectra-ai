@@ -1,18 +1,24 @@
 # Cloudflared Tunnel
 
-The Vectra AI production environment uses **Cloudflare Tunnel (Cloudflared)** to securely expose the n8n web interface without opening inbound ports on the Oracle Cloud Infrastructure (OCI) virtual machine.
+> **Previous Deployment Architecture**
+>
+> Cloudflare Tunnel (Cloudflared) was used during the initial production deployment of Vectra AI to securely expose the n8n web interface without directly opening inbound application ports on the Oracle Cloud Infrastructure (OCI) virtual machine.
+>
+> The current production architecture uses **DuckDNS, Nginx and Let's Encrypt** to provide persistent domain resolution, reverse proxy routing and HTTPS access.
+>
+> This documentation is retained as part of the project's infrastructure evolution and as a reference for an alternative secure deployment strategy.
 
 ---
 
 ## Purpose
 
-Cloudflared creates an encrypted outbound connection from the OCI VM to the Cloudflare network.
+In the initial deployment architecture, Cloudflared created an encrypted outbound connection from the OCI VM to the Cloudflare network.
 
-This approach eliminates the need to expose ports such as **80**, **443** or **5678** directly to the Internet, providing an additional security layer.
+This approach allowed the n8n service to be accessed externally without directly exposing its application port to the Internet.
 
 ---
 
-## Architecture
+## Previous  Architecture
 
 ```
 Internet
@@ -64,7 +70,7 @@ Automates:
 
 ---
 
-## Deployment Flow
+## Historical Deployment Flow
 
 1. Install Cloudflared
 2. Authenticate the tunnel
@@ -77,7 +83,7 @@ Automates:
 
 ## Security
 
-Cloudflared improves the deployment security by:
+The Cloudflared-based deployment provided the following security characteristics:
 
 - No inbound ports exposed
 - Encrypted tunnel
@@ -94,3 +100,17 @@ Cloudflared improves the deployment security by:
 - No public reverse proxy required
 - Automatic HTTPS
 - Compatible with Oracle Cloud Free Tier
+
+---
+
+## Current Production Architecture
+
+The current Vectra AI production environment replaced Cloudflare Tunnel with a persistent domain and reverse proxy architecture based on:
+
+- DuckDNS for domain resolution
+- Nginx as the reverse proxy
+- Let's Encrypt for TLS certificates and HTTPS
+- Oracle Cloud Infrastructure as the compute environment
+- Docker for application containerization
+
+The Cloudflared implementation remains documented in this repository to preserve the architectural history of the project and provide an alternative deployment reference.

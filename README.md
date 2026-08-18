@@ -77,7 +77,7 @@ Enterprise Retrieval-Augmented Generation (RAG) Assistant for Logistics Knowledg
 | 📦 [Deployment Overview](deployment/README.md) | Production deployment guide |
 | 🐳 [Docker](deployment/docker/README.md) | Docker environment and containers |
 | ☁️ [Oracle Cloud Infrastructure](deployment/oci/README.md) | Oracle Cloud deployment documentation |
-| 🌐 [Cloudflare Tunnel](deployment/cloudflared/README.md) | Secure HTTPS tunnel configuration |
+| 🌐 [Cloudflare Tunnel](deployment/cloudflared/README.md) | Previous HTTPS deployment approach (retained for architecture history) |
 | ⚙️ [Workflows](workflows/) | Exported n8n workflows |
 | 📚 [Knowledge Base](docs/) | AI prompts and corporate documentation |
 
@@ -102,6 +102,7 @@ The complete solution integrates:
 - Docker
 - Oracle Cloud Infrastructure
 - Cloudflare Tunnel
+- DuckDNS + Nginx + Let's Encrypt
 - Telegram Bot
 
 ---
@@ -128,7 +129,9 @@ The conversational interface hides the complexity of the Retrieval-Augmented Gen
 - ✅ Qdrant Vector Database
 - ✅ n8n Workflow Automation
 - ✅ Oracle Cloud Deployment
-- ✅ Cloudflare Tunnel
+- ✅ DuckDNS Persistent Domain
+- ✅ Nginx Reverse Proxy
+- ✅ Let's Encrypt HTTPS
 - ✅ Telegram Conversational Assistant
 - ✅ Dockerized Infrastructure
 - ✅ End-to-End Production Validation
@@ -182,10 +185,13 @@ Vectra AI combines modern AI technologies with enterprise infrastructure compone
 | Workflow Automation | n8n |
 | Vector Database | Qdrant |
 | Embeddings | Google Gemini |
-| Large Language Model | Groq |
+| Large Language Model | Qwen 3.6 27B |
+| LLM Inference Provider | Groq |
 | Containerization | Docker |
 | Cloud Infrastructure | Oracle Cloud Infrastructure |
-| HTTPS Access | Cloudflare Tunnel |
+| Domain Resolution | DuckDNS |
+| Reverse Proxy | Nginx |
+| TLS / HTTPS | Let's Encrypt |
 | Messaging Platform | Telegram |
 
 ---
@@ -291,11 +297,13 @@ Production components include:
 - Docker Compose
 - n8n
 - Qdrant
-- Cloudflare Tunnel
+- DuckDNS
+- Nginx Reverse Proxy
+- Let's Encrypt
 - Telegram Bot
 - Persistent Storage
 
-The platform provides secure HTTPS access while keeping internal services isolated.
+The platform provides persistent domain resolution and secure HTTPS access through Nginx and Let's Encrypt while keeping application services containerized within the Oracle Cloud environment.
 
 ---
 
@@ -543,6 +551,15 @@ Qdrant stores semantic representations of the enterprise knowledge base.
 
 The vector database enables semantic similarity search, allowing the assistant to retrieve only the most relevant documentation before generating an answer.
 
+Production validation confirmed:
+
+- Collection status: green
+- 50 indexed document chunks
+- 3072-dimensional vectors
+- Cosine similarity search
+- Persistent Docker volume
+- Snapshot backup successfully validated
+
 ---
 
 ## Collections
@@ -585,7 +602,9 @@ The production environment includes:
 - Docker Compose
 - n8n
 - Qdrant
-- Cloudflare Tunnel
+- Nginx
+- DuckDNS
+- Let's Encrypt
 
 ---
 
@@ -627,10 +646,33 @@ The complete production deployment has been successfully validated.
 | RAG Retrieval | ✅ |
 | Source Attribution | ✅ |
 | Oracle Cloud Infrastructure | ✅ |
-| Cloudflare Tunnel | ✅ |
+| DuckDNS | ✅ |
+| Nginx Reverse Proxy | ✅ |
+| Let's Encrypt HTTPS | ✅ |
 | Telegram Assistant | ✅ |
 
 ---
+
+# LLM Evaluation
+
+A controlled model evaluation was performed using the same RAG architecture, knowledge base, embeddings, system prompt and Qdrant retrieval configuration.
+
+The objective was to compare answer quality, groundedness, tool-calling behavior, latency and operational reliability under real workflow conditions.
+
+| Model | Tool Calling | Answer Quality | Operational Behavior | Result |
+|-------|:------------:|---------------|----------------------|--------|
+| Qwen 3.6 27B | ✅ | High | Best overall balance between response quality, tool usage and operational stability | **Selected** |
+| GPT-OSS 120B | ✅ | High | Strong responses when completed, but repeated agent/tool cycles triggered rate-limit events | Evaluated |
+| GPT-OSS 20B | ✅ | Good | Similar rate-limit behavior and inconsistent handling in some test cases | Evaluated |
+| Compound Mini | ❌ | Not evaluated | Tool calling unsupported in the tested configuration | Incompatible |
+
+The evaluation included direct factual questions, multi-document synthesis, out-of-scope requests, missing-information scenarios and sequential-query stress tests.
+
+Qwen 3.6 27B was selected as the production model because it provided the best overall balance for the current Vectra AI architecture.
+
+These results reflect the tested architecture and API limits and should not be interpreted as a universal benchmark between the models.
+
+----
 
 # Telegram AI Assistant
 
@@ -760,7 +802,7 @@ Execute the workflows in the following order:
 
 Vectra AI has been successfully deployed and validated on Oracle Cloud Infrastructure.
 
-The production environment includes:
+The current production environment includes:
 
 - Oracle Cloud Virtual Machine
 - Ubuntu Server
@@ -769,9 +811,13 @@ The production environment includes:
 - n8n
 - Qdrant
 - Google Gemini Embeddings
-- Groq
-- Cloudflare Tunnel
+- Qwen 3.6 27B
+- Groq Inference API
+- DuckDNS
+- Nginx Reverse Proxy
+- Let's Encrypt HTTPS
 - Telegram Bot
+
 
 Deployment documentation is available in:
 
@@ -823,13 +869,15 @@ This separation allows documentation updates without modifying runtime behavior.
 
 ---
 
-### Dedicated AI Models
+### AI Models and Inference
 
-Google Gemini is responsible for semantic embedding generation.
+Google Gemini is responsible for generating semantic embeddings used to index and retrieve enterprise knowledge from Qdrant.
 
-Groq is responsible for grounded response generation.
+Qwen 3.6 27B serves as the production Large Language Model (LLM), generating grounded responses based on the context retrieved by the RAG pipeline.
 
-Using specialized models for each task improves performance while simplifying maintenance.
+Groq provides the inference infrastructure used to execute the production LLM with low-latency response generation.
+
+Separating embedding generation, language model inference and vector retrieval allows each component to be independently optimized and maintained.
 
 ---
 
@@ -869,7 +917,8 @@ Although the project is functionally complete, future iterations could include:
 
 | Category | Value |
 |----------|------:|
-| AI Models | 2 |
+| Production AI Models | 2 |
+| LLMs Evaluated | 4 |
 | Vector Database | 1 |
 | Docker Containers | 2 |
 | n8n Workflows | 3 |
@@ -877,6 +926,7 @@ Although the project is functionally complete, future iterations could include:
 | Messaging Platform | Telegram |
 | Knowledge Domains | 6 |
 | Indexed Document Chunks | 50 |
+| Vector Dimensions | 3072 |
 
 ---
 
@@ -887,12 +937,17 @@ This project demonstrates practical experience with:
 - Enterprise Artificial Intelligence
 - Retrieval-Augmented Generation (RAG)
 - Prompt Engineering
+- LLM Evaluation and Model Selection
+- Semantic Search and Vector Retrieval
 - Workflow Automation
 - Vector Databases
-- Docker
-- Cloud Infrastructure
+- Docker and Containerized Services
 - Oracle Cloud Infrastructure
-- Production Deployment
+- Linux Server Administration
+- Reverse Proxy Configuration with Nginx
+- DNS and HTTPS Configuration
+- Production Deployment and Validation
+- Backup and Data Persistence
 - Enterprise AI Architecture
 
 ---
@@ -909,18 +964,22 @@ Its objective was to design, implement and deploy an enterprise-grade Retrieval-
 
 ## Francelly Andrade
 
-Electrical Engineer passionate about Artificial Intelligence, Workflow Automation and Enterprise Software Engineering.
+Electrical Engineer focused on Artificial Intelligence, Automation, Data Engineering and Cloud-based solutions.
 
 Vectra AI was developed as a portfolio project to demonstrate practical experience in:
 
-- Enterprise AI
-- Retrieval-Augmented Generation
-- Vector Databases
-- Workflow Automation
-- Cloud Deployment
-- Docker
+- Enterprise Artificial Intelligence
+- Retrieval-Augmented Generation (RAG)
+- LLM Evaluation and Model Selection
+- Semantic Search and Vector Databases
+- Workflow Automation with n8n
+- Docker and Containerized Applications
 - Oracle Cloud Infrastructure
-- Software Engineering
+- Linux Server Administration
+- Production AI Deployment
+- DNS, Reverse Proxy and HTTPS Configuration
+- Backup and Data Persistence
+- Software Engineering and Technical Documentation
 
 GitHub:
 
